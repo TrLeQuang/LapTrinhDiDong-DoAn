@@ -1,97 +1,71 @@
 package com.example.nearbystore.Activites.Dashboard
 
-import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.nearbystore.Activites.Navigation.Screen
 import com.example.nearbystore.R
 
+data class BottomMenuItem(val label: String, val icon: Painter, val route: String)
 
 @Composable
-@Preview
-fun MyBottomBar() {
-    val bottomMenuItemsList = prepareBottomMenu()
-    val context = LocalContext.current
-    var selected by remember { mutableStateOf("Home") }
+fun MyBottomBar(navController: NavController) {
+    val items = listOf(
+        BottomMenuItem("Home", painterResource(R.drawable.btn_1), Screen.Home.route),
+        BottomMenuItem("Support", painterResource(R.drawable.btn_2), Screen.Support.route),
+        BottomMenuItem("Wishlist", painterResource(R.drawable.btn_3), Screen.Wishlist.route),
+        BottomMenuItem("Profile", painterResource(R.drawable.btn_4), Screen.Profile.route)
+    )
+
+    var selectedItem by remember { mutableStateOf(Screen.Home.route) }
 
     BottomAppBar(
         backgroundColor = colorResource(R.color.white),
         elevation = 3.dp
     ) {
-        bottomMenuItemsList.forEach { bottomMenuItems ->
+        items.forEach { item ->
             BottomNavigationItem(
-                selected = (selected == bottomMenuItems.label),
+                selected = selectedItem == item.route,
                 onClick = {
-                    selected = bottomMenuItems.label
-                    Toast.makeText(context, bottomMenuItems.label, Toast.LENGTH_SHORT).show()
-                }, icon = {
+                    selectedItem = item.route
+                    navController.navigate(item.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                },
+                icon = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
-                            painter = bottomMenuItems.icon,
+                            painter = item.icon,
                             contentDescription = null,
-                            tint = colorResource(R.color.darkBrown),
                             modifier = Modifier
                                 .padding(top = 8.dp)
-                                .size(20.dp)
+                                .size(20.dp),
+                            tint = colorResource(R.color.darkBrown)
                         )
                         Text(
-                            text = bottomMenuItems.label,
+                            text = item.label,
                             fontSize = 12.sp,
                             color = colorResource(R.color.darkBrown),
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
             )
         }
     }
-}
-
-data class BottomMenuItem(
-    val label: String, val icon: Painter
-)
-
-@Composable
-fun prepareBottomMenu(): List<BottomMenuItem> {
-    val bottomMenuItemList = arrayListOf<BottomMenuItem>()
-
-    bottomMenuItemList.add(BottomMenuItem(label = "Home", icon = painterResource(R.drawable.btn_1)))
-    bottomMenuItemList.add(
-        BottomMenuItem(
-            label = "Support",
-            icon = painterResource(R.drawable.btn_2)
-        )
-    )
-    bottomMenuItemList.add(
-        BottomMenuItem(
-            label = "Wishlist",
-            icon = painterResource(R.drawable.btn_3)
-        )
-    )
-    bottomMenuItemList.add(
-        BottomMenuItem(
-            label = "Profile",
-            icon = painterResource(R.drawable.btn_4)
-        )
-    )
-
-    return bottomMenuItemList
 }

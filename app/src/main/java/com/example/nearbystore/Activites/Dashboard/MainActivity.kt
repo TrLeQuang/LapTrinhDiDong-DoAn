@@ -3,88 +3,52 @@ package com.example.nearbystore.Activites.Dashboard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.nearbystore.Activites.Dashboard.Banner
-import com.example.nearbystore.Activites.Dashboard.CategorySection
+import androidx.compose.foundation.layout.padding
+import androidx.navigation.compose.*
+import com.example.nearbystore.Activites.Navigation.Screen
 import com.example.nearbystore.R
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.example.nearbystore.Domain.BannerModel
-import com.example.nearbystore.Domain.CategoryModel
-import com.example.nearbystore.Repository.DashboardRepository
+import com.example.nearbystore.Activites.Screens.*
+import com.example.nearbystore.Activites.Dashboard.MyBottomBar
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val displayName = currentUser?.displayName ?: "User"
+        val photoUrl = currentUser?.photoUrl?.toString() ?: ""
+        val email = currentUser?.email ?: ""
 
         setContent {
-            DashboardScreen()
+            val navController = rememberNavController()
+
+            Scaffold(
+                bottomBar = {
+                    MyBottomBar(navController = navController)
+                }
+            ) { paddingValues ->
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Home.route,
+                    modifier = Modifier.padding(paddingValues)
+                ) {
+                    composable(Screen.Home.route) {
+                        HomeScreen(displayName, photoUrl)
+                    }
+                    composable(Screen.Support.route) {
+                        SupportScreen()
+                    }
+                    composable(Screen.Wishlist.route) {
+                        WishlistScreen()
+                    }
+                    composable(Screen.Profile.route) {
+                        ProfileScreen(displayName, email, photoUrl)
+                    }
+                }
+            }
         }
     }
 }
-
-@Composable
-@Preview
-fun DashboardScreen() {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(color = colorResource(id = R.color.blue))
-
-    val viewModel = DashboardRepository()
-
-    val categories = remember { mutableStateListOf<CategoryModel>() }
-    val banners = remember { mutableStateListOf<BannerModel>() }
-
-    var showCategoryLoading by remember { mutableStateOf(true) }
-    var showBannerLoading by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        viewModel.loadCategory().observeForever {
-            categories.clear()
-            categories.addAll(it)
-            showCategoryLoading = false
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.loadBanner().observeForever {
-            banners.clear()
-            banners.addAll(it)
-            showBannerLoading=false
-        }
-    }
-
-
-    Scaffold(
-        bottomBar = { MyBottomBar() }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = colorResource(R.color.lightBlue))
-                .padding(paddingValues = paddingValues)
-        ) {
-
-            item { TopBar() }
-            item { CategorySection(categories,showCategoryLoading) }
-            item{ Banner(banners,showBannerLoading) }
-        }
-
-    }
-}
-
