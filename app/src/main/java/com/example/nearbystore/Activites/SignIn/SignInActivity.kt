@@ -105,7 +105,7 @@ fun SignInScreen(onSignInClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "Welcome!", fontSize = 28.sp, color = Color.White, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(24.dp))
-            Text(text = "Please sign in with your google account to continue!", fontSize = 20.sp, color = Color.White, textAlign = TextAlign.Center)
+            Text(text = "Please sign in with your Google account to continue!", fontSize = 20.sp, color = Color.White, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(32.dp))
             Button(
                 onClick = onSignInClick,

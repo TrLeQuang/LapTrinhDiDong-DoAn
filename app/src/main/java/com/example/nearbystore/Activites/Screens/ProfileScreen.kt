@@ -1,7 +1,10 @@
 package com.example.nearbystore.Activites.Screens
 
 import android.content.Intent
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -50,14 +55,14 @@ fun ProfileScreen(name: String, email: String, photoUrl: String) {
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            AsyncImage(
-                model = photoUrl,
+            Image(
+                painter = rememberAsyncImagePainter(model = photoUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
-                    .background(Color.White, CircleShape)
-                    .padding(4.dp)
+                    .border(2.dp, Color.White, CircleShape), // Optional viền trắng
+                contentScale = ContentScale.Crop
             )
         }
 
@@ -68,13 +73,28 @@ fun ProfileScreen(name: String, email: String, photoUrl: String) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(top = 16.dp),
+                .padding(top = 5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = email, fontSize = 16.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    Toast.makeText(context, "This function will be developed in the future.", Toast.LENGTH_SHORT).show()
+                },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .fillMaxWidth()
+            ) {
+                Text("Link to Bank")
+            }
+
+
+            Spacer(modifier = Modifier.height(15.dp))
             Button(
                 onClick = {
                     FirebaseAuth.getInstance().signOut()
